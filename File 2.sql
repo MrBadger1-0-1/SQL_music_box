@@ -2,8 +2,7 @@
 -- Задание 2
 -- Название и продолжительность самого длительного трека.
 select track_name, duration from track
-order by duration desc
-limit 1;
+where duration = (select MAX(duration) from track);
 
 -- Название треков, продолжительность которых не менее 3,5 минут.
 select track_name from track
@@ -19,7 +18,7 @@ where autor_name !~ '[ \t\v\b\r\n\u00a0]';
 
 -- Название треков, которые содержат слово «мой» или «my».
 select track_name from track
-where track_name like '%My%' or track_name like '%my%';
+where track_name ilike '%my%';
 
 -- Задание 3
 -- Количество исполнителей в каждом жанре.
@@ -43,15 +42,18 @@ order by duration desc;
 select autor_name from autor a 
 join album_autor aa  on aa.autorid = a.autorid
 join album a2 on a2.albumid = aa.albumid
-where relise_date not between '2020-01-01' and '2020.12.31'
+except
+select autor_name from autor a 
+join album_autor aa  on aa.autorid = a.autorid
+join album a2 on a2.albumid = aa.albumid
+where relise_date between '2020-01-01' and '2020.12.31'
 group by autor_name;
 
 -- Названия сборников, в которых присутствует конкретный исполнитель (выберите его сами)(Apocalyptica).
-select collection_name from collection c 
+select distinct(collection_name) from collection c 
 join collection_track ct on c.collectionid = ct.collectionid 
 join track t on ct.trackid = t.trackid 
 join album a on t.albumid = a.albumid
 join album_autor aa on a.albumid = aa.albumid 
 join autor a2 on aa.autorid = a2.autorid 
-where autor_name like 'Apoc%'
-group by collection_name;
+where autor_name like 'Apoc%';
